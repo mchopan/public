@@ -17,6 +17,44 @@
 
 <body>
     <div class="container">
+        <header class="dashboard-header">
+            <div class="header-container">
+                <div class="header-left">
+                    <h1>Dashboard</h1>
+                    <nav class="breadcrumb">
+                        <span>Home</span>
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Dashboard</span>
+                    </nav>
+                </div>
+
+                <div class="header-right">
+                    <div class="header-search">
+                        <i class="fas fa-search"></i>
+                        <input type="search" id="locationSearch" placeholder="Search locations...">
+                    </div>
+
+                    <div class="user-menu">
+                        <button class="notifications-btn">
+                            <i class="fas fa-bell"></i>
+                            <!-- <span class="notification-badge">3</span> -->
+                        </button>
+
+                        <div class="user-profile">
+                            <img src="./assets/user-profile.png" alt="User Avatar" class="avatar">
+                            <div class="user-info">
+                                <span class="user-name" id="profileUsername">Loading...</span>
+                                <span class="user-role" id="profileRole">Loading...</span>
+                            </div>
+                            <button class="profile-dropdown-btn">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
         <h1>Location Rates Management</h1>
 
         <!-- Add Location Rate Form -->

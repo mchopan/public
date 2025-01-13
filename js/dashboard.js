@@ -1,6 +1,33 @@
 import LocationRatesService from './locationRates.js';
 import ModalManager from './modal.js';
 import requireAuth from './authMiddleware.js';
+import AuthService from './authService.js';
+
+function loadUserProfile() {
+    const adminData = JSON.parse(localStorage.getItem('quickload_admin'));
+    if (adminData) {
+        document.getElementById('profileUsername').textContent = adminData.username;
+        document.getElementById('profileRole').textContent = adminData.role;
+    }
+}
+
+document.getElementById('locationSearch').addEventListener('input', function (e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('#ratesTableBody tr');
+
+    rows.forEach(row => {
+        const fromLocation = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+        const toLocation = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+
+        if (fromLocation.includes(searchTerm) || toLocation.includes(searchTerm)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', loadUserProfile);
 
 class DashboardUI {
     constructor() {
@@ -17,6 +44,9 @@ class DashboardUI {
             document.querySelector('.close')
         );
 
+        // New header initialization
+        this.initializeHeader();
+
         // Bind event listeners
         this.locationRateForm.addEventListener('submit', this.handleAddRate.bind(this));
         this.editForm.addEventListener('submit', this.handleEditRate.bind(this));
@@ -25,21 +55,141 @@ class DashboardUI {
         this.loadLocationRates();
     }
 
-    initializeElements() {
-        this.tableBody = document.getElementById('ratesTableBody');
-        this.editModal = document.getElementById('editModal');
-        this.modalManager = new ModalManager(
-            this.editModal,
-            document.querySelector('.close')
-        );
+    initializeHeader() {
+        // Search functionality
+        const searchInput = document.querySelector('.header-search input');
+        if (searchInput) {
+            searchInput.addEventListener('input', this.handleSearch.bind(this));
+        }
+
+        // Notifications
+        const notificationsBtn = document.querySelector('.notifications-btn');
+        if (notificationsBtn) {
+            notificationsBtn.addEventListener('click', this.handleNotifications.bind(this));
+        }
+
+        // User Profile Dropdown
+        const userProfile = document.querySelector('.user-profile');
+        if (userProfile) {
+            userProfile.addEventListener('click', this.handleUserProfileDropdown.bind(this));
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', this.handleClickOutside.bind(this));
+
+        // Load user data
+        this.loadUserData();
     }
 
-    setupEventListeners() {
-        document.getElementById('locationRateForm')
-            .addEventListener('submit', (e) => this.handleAddRate(e));
+    async loadUserData() {
+        try {
+            const user = AuthService.getAdminUser();
+            if (user) {
+                const userNameElement = document.querySelector('.user-name');
+                const userRoleElement = document.querySelector('.user-role');
+                const avatarElement = document.querySelector('.avatar');
 
-        document.getElementById('editForm')
-            .addEventListener('submit', (e) => this.handleEditRate(e));
+                if (userNameElement) userNameElement.textContent = user.username || 'User';
+                if (userRoleElement) userRoleElement.textContent = user.role || 'Administrator';
+                if (avatarElement && user.avatar) avatarElement.src = user.avatar;
+            }
+        } catch (error) {
+            console.error('Error loading user data:', error);
+        }
+    }
+
+    handleSearch(event) {
+        const searchTerm = event.target.value.toLowerCase();
+        const rows = this.tableBody.getElementsByTagName('tr');
+
+        Array.from(rows).forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+    }
+
+    handleNotifications() {
+        // Create notifications dropdown if it doesn't exist
+        let notificationsDropdown = document.querySelector('.notifications-dropdown');
+
+        if (!notificationsDropdown) {
+            notificationsDropdown = document.createElement('div');
+            notificationsDropdown.className = 'notifications-dropdown';
+            notificationsDropdown.innerHTML = `
+                <div class="dropdown-header">
+                    <h3>Notifications</h3>
+                    <button class="mark-all-read">Mark all as read</button>
+                </div>
+                <div class="notifications-list">
+                    <div class="notification-item unread">
+                        <i class="fas fa-info-circle"></i>
+                        <div class="notification-content">
+                            <p>New location rate added</p>
+                            <span class="notification-time">2 minutes ago</span>
+                        </div>
+                    </div>
+                    <!-- Add more notification items as needed -->
+                </div>
+            `;
+
+            const notificationsBtn = document.querySelector('.notifications-btn');
+            notificationsBtn.parentNode.appendChild(notificationsDropdown);
+        } else {
+            notificationsDropdown.classList.toggle('show');
+        }
+    }
+
+    handleUserProfileDropdown() {
+        // Create user dropdown if it doesn't exist
+        let userDropdown = document.querySelector('.user-dropdown');
+
+        if (!userDropdown) {
+            userDropdown = document.createElement('div');
+            userDropdown.className = 'user-dropdown';
+            userDropdown.innerHTML = `
+                <div class="dropdown-item">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </div>
+                <div class="dropdown-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </div>
+            `;
+
+            const userProfile = document.querySelector('.user-profile');
+            userProfile.parentNode.appendChild(userDropdown);
+
+            // Add logout functionality
+            userDropdown.querySelector('.logout').addEventListener('click', () => {
+                AuthService.adminLogout();
+            });
+        } else {
+            userDropdown.classList.toggle('show');
+        }
+    }
+
+    handleClickOutside(event) {
+        // Close notifications dropdown
+        if (!event.target.closest('.notifications-btn')) {
+            const notificationsDropdown = document.querySelector('.notifications-dropdown');
+            if (notificationsDropdown?.classList.contains('show')) {
+                notificationsDropdown.classList.remove('show');
+            }
+        }
+
+        // Close user profile dropdown
+        if (!event.target.closest('.user-profile')) {
+            const userDropdown = document.querySelector('.user-dropdown');
+            if (userDropdown?.classList.contains('show')) {
+                userDropdown.classList.remove('show');
+            }
+        }
     }
 
     async handleAddRate(e) {
@@ -200,6 +350,116 @@ class DashboardUI {
 
     // ... (Additional UI methods)
 }
+
+// Add these styles to your dashboard.css
+const styles = `
+    /* Dropdown Styles */
+    .notifications-dropdown,
+    .user-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        min-width: 250px;
+        display: none;
+        z-index: 1000;
+    }
+
+    .notifications-dropdown.show,
+    .user-dropdown.show {
+        display: block;
+    }
+
+    .dropdown-header {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .dropdown-header h3 {
+        margin: 0;
+        font-size: 1rem;
+    }
+
+    .mark-all-read {
+        color: var(--accent-color);
+        background: none;
+        border: none;
+        font-size: 0.875rem;
+        cursor: pointer;
+    }
+
+    .notifications-list {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .notification-item {
+        padding: 1rem;
+        display: flex;
+        gap: 1rem;
+        border-bottom: 1px solid var(--border-color);
+        cursor: pointer;
+    }
+
+    .notification-item:hover {
+        background-color: var(--bg-light);
+    }
+
+    .notification-item.unread {
+        background-color: rgba(61, 90, 128, 0.05);
+    }
+
+    .notification-content p {
+        margin: 0;
+        font-size: 0.875rem;
+    }
+
+    .notification-time {
+        font-size: 0.75rem;
+        color: var(--text-light);
+    }
+
+    .dropdown-item {
+        padding: 0.75rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+    }
+
+    .dropdown-item:hover {
+        background-color: var(--bg-light);
+    }
+
+    .dropdown-item i {
+        color: var(--text-light);
+        width: 1rem;
+    }
+
+    .dropdown-divider {
+        height: 1px;
+        background-color: var(--border-color);
+        margin: 0.5rem 0;
+    }
+
+    .logout {
+        color: var(--danger-color);
+    }
+
+    .logout i {
+        color: var(--danger-color);
+    }
+`;
+
+// Add styles to the document
+const styleSheet = document.createElement('style');
+styleSheet.textContent = styles;
+document.head.appendChild(styleSheet);
 
 // Initialize dashboard with auth check
 document.addEventListener('DOMContentLoaded', () => {

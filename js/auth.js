@@ -16,9 +16,11 @@ class AuthService {
 
             const data = await response.json();
 
+
             console.log('Admin login data:', data);
             // Store the admin token and info in localStorage
             if (data.token) {
+                localStorage.setItem('quickload_admin', JSON.stringify(data.user));
                 localStorage.setItem('adminToken', data.token);
                 localStorage.setItem('adminUser', JSON.stringify(data.user.username));
             }
