@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Rates Dashboard</title>
+    <link rel="stylesheet" href="./css/dashboard.css">
+    <script>
+        // Immediate check before loading dashboard
+        if (!localStorage.getItem('adminToken')) {
+            sessionStorage.setItem('intendedUrl', window.location.href);
+            window.location.href = '/index.html';
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Location Rates Management</h1>
+
+        <!-- Add Location Rate Form -->
+        <div class="form-container">
+            <h2>Add New Location Rate</h2>
+            <form id="locationRateForm">
+                <input type="text" id="fromLocation" placeholder="From Location" required>
+                <input type="text" id="toLocation" placeholder="To Location" required>
+                <select id="vehicleType" required>
+                    <option value="">Select Vehicle Type</option>
+                    <option value="SUV">SUV</option>
+                    <option value="Sedan">Sedan</option>
+                    <option value="Mini">Mini</option>
+                </select>
+                <input type="number" id="price" placeholder="Price" required>
+                <button type="submit">Add Rate</button>
+            </form>
+        </div>
+
+        <!-- Location Rates Table -->
+        <div class="table-container">
+            <h2>Location Rates</h2>
+            <table id="ratesTable">
+                <thead>
+                    <tr>
+                        <th>From Location</th>
+                        <th>To Location</th>
+                        <th>Vehicle Type</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="ratesTableBody">
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Location Rate</h2>
+            <form id="editForm">
+                <input type="hidden" id="editId">
+                <input type="text" id="editFromLocation" required>
+                <input type="text" id="editToLocation" required>
+                <select id="editVehicleType" required>
+                    <option value="SUV">SUV</option>
+                    <option value="Sedan">Sedan</option>
+                    <option value="Mini">Mini</option>
+                </select>
+                <input type="number" id="editPrice" required>
+                <button type="submit">Update</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="js/dashboard.js"></script>
+</body>
+
+</html>

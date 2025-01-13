@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickLoad - Smart Logistics Solutions</title>
+    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script type="module" src="./js/main.js"></script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <h1>QuickLoad</h1>
+        </div>
+        <div class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#services">Services</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+            <button id="loginBtn" class="login-btn">Login</button>
+        </div>
+    </nav>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Login to QuickLoad</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="appDownloadModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Download QuickLoad App</h2>
+            <p>Experience seamless logistics management on your mobile device</p>
+            <div class="app-download-buttons">
+                <a href="#" class="app-store-button">
+                    <img src="assets/app-store-badge.png" alt="Download on App Store">
+                </a>
+                <a href="#" class="play-store-button">
+                    <img src="assets/play-store-badge.png" alt="Get it on Google Play">
+                </a>
+            </div>
+            <div class="app-features">
+                <div class="feature">
+                    <i class="fas fa-bolt"></i>
+                    <span>Quick Booking</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Real-time Tracking</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-bell"></i>
+                    <span>Instant Notifications</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <section id="hero">
+            <div class="hero-content">
+                <h1>Connect Dealers with Truck Drivers</h1>
+                <p>India's trusted platform for booking trucks and finding loads</p>
+                <div class="hero-buttons">
+                    <button class="cta-button dealer-btn">I Need a Truck</button>
+                    <button class="cta-button driver-btn">I Have a Truck</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="features">
+            <h2>Why Choose QuickLoad?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-truck-moving"></i>
+                    <h3>For Dealers</h3>
+                    <ul>
+                        <li>Book trucks instantly</li>
+                        <li>Competitive pricing</li>
+                        <li>Real-time tracking</li>
+                        <li>Verified drivers</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-box"></i>
+                    <h3>For Drivers</h3>
+                    <ul>
+                        <li>Find loads easily</li>
+                        <li>Guaranteed payments</li>
+                        <li>No empty returns</li>
+                        <li>Better earnings</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Platform Benefits</h3>
+                    <ul>
+                        <li>24/7 Support</li>
+                        <li>Price negotiation</li>
+                        <li>Secure payments</li>
+                        <li>Pan India network</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="how-it-works">
+            <h2>How It Works</h2>
+            <div class="steps-grid">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Register</h3>
+                    <p>Sign up as a dealer or driver with basic details</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Connect</h3>
+                    <p>Post your requirement or find available loads</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Negotiate</h3>
+                    <p>Agree on rates and terms directly through the platform</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Track & Pay</h3>
+                    <p>Monitor shipments and process secure payments</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="services" class="services-section">
+            <h2>Our Services</h2>
+            <div class="service-container">
+                <div class="service-card">
+                    <i class="fas fa-truck-moving"></i>
+                    <h3>Truck Booking Platform</h3>
+                    <p>Our flagship service connects truck owners with businesses needing logistics solutions.</p>
+                    <ul>
+                        <li>Real-time tracking</li>
+                        <li>Instant booking</li>
+                        <li>Secure payments</li>
+                        <li>Rate negotiation</li>
+                    </ul>
+                    <div class="coming-soon">
+                        <h4>Coming Soon</h4>
+                        <ul>
+                            <li>Warehouse Solutions</li>
+                            <li>Express Delivery</li>
+                            <li>International Shipping</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="about-section">
+            <h2>About QuickLoad</h2>
+            <div class="about-container">
+                <div class="about-content">
+                    <h3>Our Story</h3>
+                    <p>Founded in 2024, QuickLoad emerged from a vision to revolutionize India's logistics sector. We
+                        identified the challenges faced by both truck owners and businesses in finding reliable partners
+                        for their transportation needs.</p>
+
+                    <h3>Our Mission</h3>
+                    <p>To create India's most trusted digital logistics platform that empowers businesses and truck
+                        owners through technology-driven solutions.</p>
+
+                    <h3>Our Impact</h3>
+                    <div class="impact-stats">
+                        <div class="stat">
+                            <span class="number">10,000+</span>
+                            <span class="label">Active Drivers</span>
+                        </div>
+                        <div class="stat">
+                            <span class="number">5,000+</span>
+                            <span class="label">Business Partners</span>
+                        </div>
+                        <div class="stat">
+                            <span class="number">100+</span>
+                            <span class="label">Cities Covered</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="contact-section">
+            <h2>Contact Us</h2>
+            <div class="contact-container">
+                <div class="contact-info">
+                    <h3>Get in Touch</h3>
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <p>1800-XXX-XXXX (Toll Free)</p>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <p>support@quickload.com</p>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-location-dot"></i>
+                            <p>123 Business Hub, Tech Park<br>Bangalore, Karnataka 560001</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <h3>Send us a Message</h3>
+                    <form id="contactForm">
+                        <input type="text" placeholder="Your Name" required>
+                        <input type="email" placeholder="Your Email" required>
+                        <select required>
+                            <option value="">Select Query Type</option>
+                            <option value="business">Business Partnership</option>
+                            <option value="support">Technical Support</option>
+                            <option value="feedback">Feedback</option>
+                        </select>
+                        <textarea placeholder="Your Message" required></textarea>
+                        <button type="submit">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>QuickLoad</h3>
+                <p>Connecting dealers and drivers across India</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#">Register as Dealer</a></li>
+                    <li><a href="#">Register as Driver</a></li>
+                    <li><a href="#">Current Rates</a></li>
+                    <li><a href="#">Support</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p>Email: support@quickload.com</p>
+                <p>Phone: 1800-XXX-XXXX</p>
+                <p>24/7 Customer Support</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 QuickLoad. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+
+</html>
