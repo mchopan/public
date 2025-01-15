@@ -1,5 +1,5 @@
 class AuthService {
-    static SERVER_URL = 'http://localhost:4100';
+    static SERVER_URL = 'http://185.199.52.115:4100';
     static async adminLogin(username, password) {
         try {
             console.log('Admin login attempt with username:', ` ${this.SERVER_URL}/api/admin/login`);

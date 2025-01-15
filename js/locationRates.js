@@ -1,5 +1,5 @@
 class LocationRatesService {
-    static SERVER_URL = 'http://localhost:4100';
+    static SERVER_URL = 'http://185.199.52.115:4100';
     static async fetchAll() {
         const response = await fetch(`${this.SERVER_URL}/location-rates`);
         const data = await response.json();

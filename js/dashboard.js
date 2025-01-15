@@ -1,7 +1,7 @@
 import LocationRatesService from './locationRates.js';
 import ModalManager from './modal.js';
 import requireAuth from './authMiddleware.js';
-import AuthService from './authService.js';
+import AuthService from './auth.js';
 
 function loadUserProfile() {
     const adminData = JSON.parse(localStorage.getItem('quickload_admin'));
@@ -10,22 +10,6 @@ function loadUserProfile() {
         document.getElementById('profileRole').textContent = adminData.role;
     }
 }
-
-document.getElementById('locationSearch').addEventListener('input', function (e) {
-    const searchTerm = e.target.value.toLowerCase();
-    const rows = document.querySelectorAll('#ratesTableBody tr');
-
-    rows.forEach(row => {
-        const fromLocation = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
-        const toLocation = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-
-        if (fromLocation.includes(searchTerm) || toLocation.includes(searchTerm)) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
-    });
-});
 
 document.addEventListener('DOMContentLoaded', loadUserProfile);
 
@@ -57,9 +41,26 @@ class DashboardUI {
 
     initializeHeader() {
         // Search functionality
-        const searchInput = document.querySelector('.header-search input');
+        const searchInput = document.querySelector('#locationSearch');
         if (searchInput) {
-            searchInput.addEventListener('input', this.handleSearch.bind(this));
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const rows = document.querySelectorAll('#ratesTableBody tr');
+
+                rows.forEach(row => {
+                    const fromLocation = row.querySelector('td:nth-child(1)')?.textContent.toLowerCase() || '';
+                    const toLocation = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
+                    const vehicleType = row.querySelector('td:nth-child(3)')?.textContent.toLowerCase() || '';
+
+                    if (fromLocation.includes(searchTerm) ||
+                        toLocation.includes(searchTerm) ||
+                        vehicleType.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
         }
 
         // Notifications
@@ -83,15 +84,15 @@ class DashboardUI {
 
     async loadUserData() {
         try {
-            const user = AuthService.getAdminUser();
-            if (user) {
+            const adminData = JSON.parse(localStorage.getItem('quickload_admin'));
+            if (adminData) {
                 const userNameElement = document.querySelector('.user-name');
                 const userRoleElement = document.querySelector('.user-role');
                 const avatarElement = document.querySelector('.avatar');
 
-                if (userNameElement) userNameElement.textContent = user.username || 'User';
-                if (userRoleElement) userRoleElement.textContent = user.role || 'Administrator';
-                if (avatarElement && user.avatar) avatarElement.src = user.avatar;
+                if (userNameElement) userNameElement.textContent = adminData.username || 'User';
+                if (userRoleElement) userRoleElement.textContent = adminData.role || 'Administrator';
+                if (avatarElement && adminData.avatar) avatarElement.src = adminData.avatar;
             }
         } catch (error) {
             console.error('Error loading user data:', error);
