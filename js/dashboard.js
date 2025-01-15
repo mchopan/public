@@ -80,6 +80,16 @@ class DashboardUI {
 
         // Load user data
         this.loadUserData();
+
+        // Add main logout button
+        const headerRight = document.querySelector('.header-right');
+        if (headerRight) {
+            const logoutBtn = document.createElement('button');
+            logoutBtn.className = 'logout-btn';
+            logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+            logoutBtn.addEventListener('click', this.handleLogout.bind(this));
+            headerRight.appendChild(logoutBtn);
+        }
     }
 
     async loadUserData() {
@@ -141,7 +151,6 @@ class DashboardUI {
     }
 
     handleUserProfileDropdown() {
-        // Create user dropdown if it doesn't exist
         let userDropdown = document.querySelector('.user-dropdown');
 
         if (!userDropdown) {
@@ -167,11 +176,28 @@ class DashboardUI {
             userProfile.parentNode.appendChild(userDropdown);
 
             // Add logout functionality
-            userDropdown.querySelector('.logout').addEventListener('click', () => {
-                AuthService.adminLogout();
+            const logoutItems = userDropdown.querySelectorAll('.logout');
+            logoutItems.forEach(item => {
+                item.addEventListener('click', this.handleLogout.bind(this));
             });
         } else {
             userDropdown.classList.toggle('show');
+        }
+    }
+
+    handleLogout() {
+        if (confirm('Are you sure you want to logout?')) {
+            try {
+                // Clear localStorage
+                localStorage.removeItem('quickload_admin');
+                localStorage.removeItem('adminToken');
+
+                // Redirect to login page
+                window.location.href = '/index.html';
+            } catch (error) {
+                console.error('Error during logout:', error);
+                alert('Error during logout. Please try again.');
+            }
         }
     }
 
