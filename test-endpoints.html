@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Endpoint Configuration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 3px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .endpoint-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        .endpoint-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 QuickLoad Endpoint Configuration Test</h1>
+    
+    <div class="test-section">
+        <h2>📋 Configuration Status</h2>
+        <button onclick="testConfiguration()">Test Configuration Loading</button>
+        <div id="configResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🌐 Endpoint Connectivity Tests</h2>
+        <div class="endpoint-grid">
+            <div class="endpoint-card">
+                <h3>Authentication Service</h3>
+                <button onclick="testAuthEndpoint()">Test Auth Endpoint</button>
+                <div id="authResult"></div>
+            </div>
+            <div class="endpoint-card">
+                <h3>Location Rates Service</h3>
+                <button onclick="testLocationRatesEndpoint()">Test Location Rates</button>
+                <div id="locationRatesResult"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔄 Alternative Endpoints</h2>
+        <p>If the main endpoints fail, you can try these alternatives:</p>
+        <button onclick="testAlternativeEndpoints()">Test Alternative Endpoints</button>
+        <div id="alternativeResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>⚙️ Manual Endpoint Configuration</h2>
+        <div>
+            <label>Backend Server:</label>
+            <input type="text" id="manualBackend" placeholder="https://your-backend-server.com" style="width: 300px; padding: 5px;">
+        </div>
+        <div style="margin-top: 10px;">
+            <label>Location Rates Server:</label>
+            <input type="text" id="manualLocationRates" placeholder="https://your-location-rates-server.com" style="width: 300px; padding: 5px;">
+        </div>
+        <div style="margin-top: 10px;">
+            <button onclick="testManualEndpoints()">Test Manual Endpoints</button>
+            <button onclick="applyManualEndpoints()">Apply Manual Endpoints</button>
+        </div>
+        <div id="manualResult"></div>
+    </div>
+
+    <script type="module">
+        import Config from './js/config.js';
+        import AuthService from './js/auth.js';
+        import LocationRatesService from './js/locationRates.js';
+
+        window.Config = Config;
+        window.AuthService = AuthService;
+        window.LocationRatesService = LocationRatesService;
+
+        window.testConfiguration = async function() {
+            const resultDiv = document.getElementById('configResult');
+            try {
+                const config = await Config.loadConfig();
+                resultDiv.innerHTML = `
+                    <div class="test-result success">
+                        <strong>✅ Configuration loaded successfully</strong>
+                        <pre>${JSON.stringify(config, null, 2)}</pre>
+                        <p><strong>Current Endpoints:</strong></p>
+                        <ul>
+                            <li><strong>Auth:</strong> ${AuthService.SERVER_URL}</li>
+                            <li><strong>Location Rates:</strong> ${LocationRatesService.SERVER_URL}</li>
+                        </ul>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="test-result error">
+                        <strong>❌ Configuration loading failed</strong>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        };
+
+        window.testAuthEndpoint = async function() {
+            const resultDiv = document.getElementById('authResult');
+            resultDiv.innerHTML = '<div class="test-result info">Testing authentication endpoint...</div>';
+            
+            try {
+                // Test if the auth endpoint is reachable
+                const response = await fetch(`${AuthService.SERVER_URL}/api/admin/validate-token`, {
+                    method: 'GET',
+                    headers: { 'Authorization': 'Bearer test-token' }
+                });
+                
+                resultDiv.innerHTML = `
+                    <div class="test-result ${response.ok ? 'success' : 'warning'}">
+                        <strong>${response.ok ? '✅' : '⚠️'} Auth Endpoint Response</strong>
+                        <p>Status: ${response.status} ${response.statusText}</p>
+                        <p>URL: ${AuthService.SERVER_URL}/api/admin/validate-token</p>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="test-result error">
+                        <strong>❌ Auth Endpoint Failed</strong>
+                        <p>Error: ${error.message}</p>
+                        <p>URL: ${AuthService.SERVER_URL}/api/admin/validate-token</p>
+                    </div>
+                `;
+            }
+        };
+
+        window.testLocationRatesEndpoint = async function() {
+            const resultDiv = document.getElementById('locationRatesResult');
+            resultDiv.innerHTML = '<div class="test-result info">Testing location rates endpoint...</div>';
+            
+            try {
+                const response = await fetch(`${LocationRatesService.SERVER_URL}/location-rates`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `
+                        <div class="test-result success">
+                            <strong>✅ Location Rates Endpoint Working</strong>
+                            <p>Status: ${response.status} ${response.statusText}</p>
+                            <p>URL: ${LocationRatesService.SERVER_URL}/location-rates</p>
+                            <p>Data received: ${Array.isArray(data) ? data.length : 'Unknown'} items</p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="test-result warning">
+                            <strong>⚠️ Location Rates Endpoint Issues</strong>
+                            <p>Status: ${response.status} ${response.statusText}</p>
+                            <p>URL: ${LocationRatesService.SERVER_URL}/location-rates</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="test-result error">
+                        <strong>❌ Location Rates Endpoint Failed</strong>
+                        <p>Error: ${error.message}</p>
+                        <p>URL: ${LocationRatesService.SERVER_URL}/location-rates</p>
+                        ${error.message.includes('SSL') ? '<p><strong>Tip:</strong> SSL/HTTPS issue detected. Try HTTP version.</p>' : ''}
+                    </div>
+                `;
+            }
+        };
+
+        window.testAlternativeEndpoints = async function() {
+            const resultDiv = document.getElementById('alternativeResult');
+            const alternatives = [
+                'http://185.199.52.115:4100',
+                'https://185.199.52.115:4100',
+                'https://quickloadbe.cogweel.com',
+                'http://quickloadbe.cogweel.com'
+            ];
+            
+            resultDiv.innerHTML = '<div class="test-result info">Testing alternative endpoints...</div>';
+            
+            let results = '<h4>Alternative Endpoint Test Results:</h4>';
+            
+            for (const endpoint of alternatives) {
+                try {
+                    const response = await fetch(`${endpoint}/location-rates`, { 
+                        method: 'GET',
+                        signal: AbortSignal.timeout(5000) // 5 second timeout
+                    });
+                    
+                    results += `
+                        <div class="test-result ${response.ok ? 'success' : 'warning'}">
+                            <strong>${response.ok ? '✅' : '⚠️'} ${endpoint}</strong>
+                            <p>Status: ${response.status} ${response.statusText}</p>
+                        </div>
+                    `;
+                } catch (error) {
+                    results += `
+                        <div class="test-result error">
+                            <strong>❌ ${endpoint}</strong>
+                            <p>Error: ${error.message}</p>
+                        </div>
+                    `;
+                }
+            }
+            
+            resultDiv.innerHTML = results;
+        };
+
+        window.testManualEndpoints = async function() {
+            const backend = document.getElementById('manualBackend').value;
+            const locationRates = document.getElementById('manualLocationRates').value;
+            const resultDiv = document.getElementById('manualResult');
+            
+            if (!backend && !locationRates) {
+                resultDiv.innerHTML = '<div class="test-result warning">Please enter at least one endpoint to test.</div>';
+                return;
+            }
+            
+            let results = '<h4>Manual Endpoint Test Results:</h4>';
+            
+            if (backend) {
+                try {
+                    const response = await fetch(`${backend}/api/admin/validate-token`, {
+                        method: 'GET',
+                        headers: { 'Authorization': 'Bearer test-token' }
+                    });
+                    results += `
+                        <div class="test-result ${response.ok ? 'success' : 'warning'}">
+                            <strong>Backend: ${backend}</strong>
+                            <p>Status: ${response.status} ${response.statusText}</p>
+                        </div>
+                    `;
+                } catch (error) {
+                    results += `
+                        <div class="test-result error">
+                            <strong>Backend: ${backend}</strong>
+                            <p>Error: ${error.message}</p>
+                        </div>
+                    `;
+                }
+            }
+            
+            if (locationRates) {
+                try {
+                    const response = await fetch(`${locationRates}/location-rates`);
+                    results += `
+                        <div class="test-result ${response.ok ? 'success' : 'warning'}">
+                            <strong>Location Rates: ${locationRates}</strong>
+                            <p>Status: ${response.status} ${response.statusText}</p>
+                        </div>
+                    `;
+                } catch (error) {
+                    results += `
+                        <div class="test-result error">
+                            <strong>Location Rates: ${locationRates}</strong>
+                            <p>Error: ${error.message}</p>
+                        </div>
+                    `;
+                }
+            }
+            
+            resultDiv.innerHTML = results;
+        };
+
+        window.applyManualEndpoints = function() {
+            const backend = document.getElementById('manualBackend').value;
+            const locationRates = document.getElementById('manualLocationRates').value;
+            
+            if (backend || locationRates) {
+                window.APP_CONFIG = window.APP_CONFIG || {};
+                if (backend) window.APP_CONFIG.BACKEND_SERVER = backend;
+                if (locationRates) window.APP_CONFIG.LOCATION_RATES_SERVER = locationRates;
+                
+                document.getElementById('manualResult').innerHTML = `
+                    <div class="test-result success">
+                        <strong>✅ Manual endpoints applied!</strong>
+                        <p>New configuration:</p>
+                        <pre>${JSON.stringify(window.APP_CONFIG, null, 2)}</pre>
+                        <p><em>Note: This is temporary and will reset on page reload.</em></p>
+                    </div>
+                `;
+            }
+        };
+
+        // Auto-run configuration test on load
+        window.addEventListener('load', async () => {
+            await testConfiguration();
+        });
+    </script>
+</body>
+</html>

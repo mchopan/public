@@ -284,12 +284,31 @@ class DashboardUI {
 
     async loadLocationRates() {
         try {
+            // Ensure configuration is loaded before making API calls
+            if (!window.APP_CONFIG) {
+                console.log('Configuration not loaded, loading now...');
+                await Config.loadConfig();
+            }
+
             const rates = await LocationRatesService.fetchAll();
             console.log('Fetched rates:', rates);
             this.renderRates(rates);
         } catch (error) {
             console.error('Error loading location rates:', error);
-            this.showError();
+
+            // Provide more specific error messages
+            let errorMessage = 'An error occurred while loading rates';
+            if (error.message.includes('Failed to fetch')) {
+                errorMessage = 'Unable to connect to server. Please check your internet connection.';
+            } else if (error.message.includes('404')) {
+                errorMessage = 'Location rates service not found. Please contact support.';
+            } else if (error.message.includes('500')) {
+                errorMessage = 'Server error. Please try again later.';
+            } else {
+                errorMessage = `Error: ${error.message}`;
+            }
+
+            this.showError(errorMessage);
         }
     }
 
@@ -495,8 +514,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         await Config.loadConfig();
         console.log('Dashboard: Configuration loaded successfully');
+        console.log('Dashboard: Using endpoints:', {
+            backend: window.APP_CONFIG?.BACKEND_SERVER,
+            locationRates: window.APP_CONFIG?.LOCATION_RATES_SERVER,
+            apiBase: window.APP_CONFIG?.API_BASE_URL
+        });
     } catch (error) {
         console.error('Dashboard: Failed to load configuration:', error);
+        // Show user-friendly error message
+        const errorDiv = document.createElement('div');
+        errorDiv.style.cssText = `
+            position: fixed; top: 20px; right: 20px;
+            background: #f8d7da; color: #721c24;
+            padding: 15px; border-radius: 5px;
+            border: 1px solid #f5c6cb; z-index: 9999;
+        `;
+        errorDiv.textContent = 'Configuration loading failed. Using default settings.';
+        document.body.appendChild(errorDiv);
+        setTimeout(() => errorDiv.remove(), 5000);
     }
 
     if (requireAuth()) {

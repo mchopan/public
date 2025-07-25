@@ -14,13 +14,27 @@ class Config {
         }
 
         try {
-            // Try to fetch the .env file
-            const response = await fetch('/.env');
-            if (response.ok) {
-                const envContent = await response.text();
+            // Try multiple paths for .env file
+            const envPaths = ['./.env', '.env', '/env'];
+            let envContent = null;
+
+            for (const path of envPaths) {
+                try {
+                    const response = await fetch(path);
+                    if (response.ok) {
+                        envContent = await response.text();
+                        console.log(`✓ Loaded .env from: ${path}`);
+                        break;
+                    }
+                } catch (e) {
+                    // Continue to next path
+                }
+            }
+
+            if (envContent) {
                 this._config = this._parseEnvContent(envContent);
             } else {
-                console.warn('Could not load .env file, using defaults');
+                console.warn('Could not load .env file from any path, using defaults');
                 this._config = this._getDefaultConfig();
             }
         } catch (error) {
@@ -29,10 +43,10 @@ class Config {
         }
 
         this._loaded = true;
-        
+
         // Make config available globally
         window.APP_CONFIG = this._config;
-        
+
         console.log('Configuration loaded:', this._config);
         return this._config;
     }
@@ -41,7 +55,7 @@ class Config {
     static _parseEnvContent(content) {
         const config = {};
         const lines = content.split('\n');
-        
+
         for (const line of lines) {
             const trimmedLine = line.trim();
             if (trimmedLine && !trimmedLine.startsWith('#')) {
@@ -53,14 +67,16 @@ class Config {
                 }
             }
         }
-        
+
         return config;
     }
 
     // Default configuration fallback
     static _getDefaultConfig() {
         return {
-            BACKEND_SERVER: 'https://quickloadbe.cogweel.com'
+            BACKEND_SERVER: 'https://quickloadbe.cogweel.com',
+            LOCATION_RATES_SERVER: 'https://quickloadbe.cogweel.com',
+            API_BASE_URL: 'https://quickloadbe.cogweel.com/api'
         };
     }
 
@@ -70,7 +86,7 @@ class Config {
             console.warn('Config not loaded yet. Call loadConfig() first.');
             return defaultValue;
         }
-        
+
         return this._config[key] || defaultValue;
     }
 

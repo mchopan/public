@@ -11,10 +11,14 @@ This document outlines the comprehensive improvements made to the QuickLoad auth
 - **Updated `js/main.js` and `js/dashboard.js`**: Added configuration loading on application startup
 
 ### Features:
-- Automatic `.env` file parsing
+- Automatic `.env` file parsing with multiple path fallbacks
 - Fallback to default configuration if `.env` is unavailable
 - Global configuration object (`window.APP_CONFIG`)
-- Environment variable: `BACKEND_SERVER=https://quickloadbe.cogweel.com`
+- Unified endpoint configuration for all services
+- Environment variables:
+  - `BACKEND_SERVER=https://quickloadbe.cogweel.com`
+  - `LOCATION_RATES_SERVER=https://quickloadbe.cogweel.com`
+  - `API_BASE_URL=https://quickloadbe.cogweel.com/api`
 
 ## 2. Enhanced Error Handling
 
