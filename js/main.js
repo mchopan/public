@@ -1,7 +1,16 @@
 import AuthService from './auth.js';
 import ModalManager from './modal.js';
+import Config from './config.js';
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
+    // Load configuration first
+    try {
+        await Config.loadConfig();
+        console.log('Configuration loaded successfully');
+    } catch (error) {
+        console.error('Failed to load configuration:', error);
+    }
+
     // Check if user is already logged in
     if (AuthService && AuthService.isAdminAuthenticated()) {
         updateUIForLoggedInUser();
@@ -32,9 +41,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         loginForm.onsubmit = async function (e) {
             e.preventDefault();
-            errorMessage.textContent = ''; // Clear previous errors
 
-            const username = document.getElementById('username').value;
+            // Clear previous errors and add loading class
+            errorMessage.textContent = '';
+            errorMessage.className = 'error-message';
+            loginForm.classList.add('loading');
+
+            const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
 
             // Add loading state
@@ -42,23 +55,63 @@ document.addEventListener('DOMContentLoaded', function () {
             const originalBtnText = submitBtn.textContent;
             submitBtn.disabled = true;
             submitBtn.textContent = 'Logging in...';
+            submitBtn.classList.add('loading');
 
             try {
                 const result = await AuthService.adminLogin(username, password);
                 if (result.success) {
-                    modalManager.hide();
-                    updateUIForLoggedInUser();
-                    // Store the intended URL if available
-                    const intendedUrl = sessionStorage.getItem('intendedUrl') || '/dashboard.html';
-                    sessionStorage.removeItem('intendedUrl');
-                    window.location.href = intendedUrl;
+                    // Show success state briefly
+                    submitBtn.textContent = 'Success!';
+                    submitBtn.classList.add('success');
+
+                    setTimeout(() => {
+                        modalManager.hide();
+                        updateUIForLoggedInUser();
+                        // Store the intended URL if available
+                        const intendedUrl = sessionStorage.getItem('intendedUrl') || '/dashboard.html';
+                        sessionStorage.removeItem('intendedUrl');
+                        window.location.href = intendedUrl;
+                    }, 500);
                 }
             } catch (error) {
-                errorMessage.textContent = error.message || 'Login failed. Please try again.';
+                // Enhanced error handling with specific messages
+                let errorText = 'Login failed. Please try again.';
+                let errorClass = 'error-message';
+
+                switch (error.type) {
+                    case AuthService.ERROR_TYPES.VALIDATION:
+                        errorText = error.message;
+                        errorClass = 'error-message validation-error';
+                        break;
+                    case AuthService.ERROR_TYPES.AUTHENTICATION:
+                        errorText = error.message;
+                        errorClass = 'error-message auth-error';
+                        break;
+                    case AuthService.ERROR_TYPES.NETWORK:
+                        errorText = 'Network error. Please check your connection and try again.';
+                        errorClass = 'error-message network-error';
+                        break;
+                    case AuthService.ERROR_TYPES.SERVER:
+                        errorText = error.message || 'Server error. Please try again later.';
+                        errorClass = 'error-message server-error';
+                        break;
+                    default:
+                        errorText = error.message || 'An unexpected error occurred. Please try again.';
+                }
+
+                errorMessage.textContent = errorText;
+                errorMessage.className = errorClass;
+
+                // Add shake animation for error
+                errorMessage.classList.add('shake');
+                setTimeout(() => errorMessage.classList.remove('shake'), 500);
+
             } finally {
                 // Reset button state
+                loginForm.classList.remove('loading');
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalBtnText;
+                submitBtn.classList.remove('loading', 'success');
             }
         };
     }
@@ -151,4 +204,4 @@ function updateUIForLoggedInUser() {
 
         navLinks.appendChild(userMenu);
     }
-} 
+}

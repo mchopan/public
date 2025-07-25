@@ -2,6 +2,7 @@ import LocationRatesService from './locationRates.js';
 import ModalManager from './modal.js';
 import requireAuth from './authMiddleware.js';
 import AuthService from './auth.js';
+import Config from './config.js';
 
 function loadUserProfile() {
     const adminData = JSON.parse(localStorage.getItem('quickload_admin'));
@@ -489,8 +490,16 @@ styleSheet.textContent = styles;
 document.head.appendChild(styleSheet);
 
 // Initialize dashboard with auth check
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Load configuration first
+    try {
+        await Config.loadConfig();
+        console.log('Dashboard: Configuration loaded successfully');
+    } catch (error) {
+        console.error('Dashboard: Failed to load configuration:', error);
+    }
+
     if (requireAuth()) {
         new DashboardUI();
     }
-}); 
+});
